@@ -1,0 +1,11 @@
+# VScode
+.vscode/
+
+# Ignore special files
+.coverage.out
+
+# Build directory
+_build/
+
+# sonarqube
+.scannerwork/*
