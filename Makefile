@@ -5,7 +5,6 @@ export SHELL := /bin/bash
 export GO111MODULE := on
 export GOOS := linux
 export GOARCH := amd64
-export GOLANGCI_LINT_VERSION := 1.36.0
 export BINARY := archsugar
 export PROJECT := github.com/sugarraysam/archsugar-cli
 export VERSION := 1.0.0

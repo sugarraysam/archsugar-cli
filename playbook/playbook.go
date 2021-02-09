@@ -1,7 +1,6 @@
 package playbook
 
 import (
-	"io/ioutil"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -38,8 +37,8 @@ func (p *playbook) DryRun() error {
 	cmd := p.Stage.Cmd()
 	cmd.Args = append(cmd.Args, DryRunFlag)
 
-	cmd.Stdout = ioutil.Discard
-	cmd.Stderr = ioutil.Discard
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
