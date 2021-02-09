@@ -22,12 +22,13 @@ func TestMain(m *testing.M) {
 	// Setup - create new directory structure under /tmp
 	tmpDir := path.Join(os.TempDir(), fmt.Sprintf("archsugar-%d", helpers.GetRandomDigit()))
 	helpers.BaseDir = tmpDir
+	playbook.PlaybookPath = path.Join(helpers.BaseDir, "playbook.yml")
 
 	// Run
 	rc := m.Run()
 
 	// Teardown
-	// _ = os.RemoveAll(tmpDir)
+	_ = os.RemoveAll(tmpDir)
 	os.Exit(rc)
 }
 

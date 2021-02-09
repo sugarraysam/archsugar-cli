@@ -5,13 +5,13 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev, master ]
-  # nightly builds @3am
+  # nightly builds @3am, on latest commit to default branch == 'dev'
   schedule:
     - cron: "0 3 * * *"
 
 env:
   GO111MODULE: on
-  
+
 jobs:
   lint:
     name: golangci-lint
