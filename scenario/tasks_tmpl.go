@@ -1,4 +1,6 @@
-# (( .Desc ))
+package scenario
+
+var TasksTmpl = `# (( .Desc ))
 ---
 - include_vars: master/(( .Name )).yml
 
@@ -23,3 +25,4 @@
 
   become: true
   become_user: "{{ user }}"
+`

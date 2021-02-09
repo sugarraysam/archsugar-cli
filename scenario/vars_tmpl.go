@@ -1,4 +1,6 @@
----
+package scenario
+
+var VarsTmpl = `---
 # - <pkg_name> # Description
 (( .Name ))_pacman_pkgs: []
 
@@ -28,3 +30,4 @@
 # Clone git repos
 # { repo: <repo>, dest: <dest>, version: <branch/tag> }
 git_repos: []
+`

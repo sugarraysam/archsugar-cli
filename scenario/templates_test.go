@@ -2,7 +2,6 @@ package scenario_test
 
 import (
 	"fmt"
-	"os"
 	"path"
 	"testing"
 
@@ -10,17 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/sugarraysam/archsugar-cli/scenario"
 )
-
-func TestTemplateFilesExist(t *testing.T) {
-	files := []string{
-		path.Join(scenario.TemplatesBasedir, scenario.VarsBasename),
-		path.Join(scenario.TemplatesBasedir, scenario.TasksBasename),
-	}
-	for _, f := range files {
-		_, err := os.Stat(f)
-		require.Nil(t, err)
-	}
-}
 
 func TestVarsTemplate(t *testing.T) {
 	name := getRandomName()

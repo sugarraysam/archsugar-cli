@@ -1,44 +1,29 @@
+TARGETS := lint test build install uninstall clean
+.PHONY: $(TARGETS)
+
 export SHELL := /bin/bash
 export GO111MODULE := on
 export GOOS := linux
 export GOARCH := amd64
 export GOLANGCI_LINT_VERSION := 1.36.0
-
-
-TEST_TARGETS := deps lint test sonar pre-commit
-.PHONY: $(TEST_TARGETS)
-
-deps:
-	@go mod tidy
-	@go mod verify
-
-lint:
-	@./scripts/golangci-lint.sh
-
-test:
-	@go test -covermode=count -coverprofile=.coverage.out ./...
-	@go tool cover -func=.coverage.out
-	@go test -race >/dev/null 2>&1
-
-sonar:
-	@./scripts/sonarqube.sh
-
-pre-commit: $(TEST_TARGETS)
-
-
-BUILD_TARGETS := build install uninstall clean
-.PHONY: $(BUILD_TARGETS)
-
-BINARY := archsugar
-PROJECT := github.com/sugarraysam/archsugar
-VERSION := 1.0.0
-COMMIT := $(shell git rev-parse --short HEAD)
-BUILD_TIME := $(shell date -u +'%Y-%m-%dT%H:%M:%S%Z')
-LDFLAGS := -s -w -X $(PROJECT)/version.Version=$(VERSION) \
+export BINARY := archsugar
+export PROJECT := github.com/sugarraysam/archsugar-cli
+export VERSION := 1.0.0
+export COMMIT := $(shell git rev-parse --short HEAD)
+export BUILD_TIME := $(shell date -u +'%Y-%m-%dT%H:%M:%S%Z')
+export LDFLAGS := -s -w -X $(PROJECT)/version.Version=$(VERSION) \
 				 -X $(PROJECT)/version.Commit=$(COMMIT) \
 				 -X $(PROJECT)/version.BuildTime=$(BUILD_TIME)
 
-build: deps
+lint:
+	@golangci-lint run
+
+test:
+	@go clean -testcache
+	@go test -covermode=count -coverprofile=.coverage.out -tags integration ./...
+	@go test -race >/dev/null 2>&1
+
+build:
 	@CGO_ENABLED=0 go build -a -installsuffix cgo -o _build/$(BINARY) -ldflags "$(LDFLAGS)"
 
 install: build
@@ -51,6 +36,5 @@ uninstall:
 FILES_TO_CLEAN := $(shell find . -type d -name _build)
 clean:
 	@echo "Cleaning files: $(FILES_TO_CLEAN)"
-	-@rm -fr $(FILES_TO_CLEAN)
-	-@go clean -testcache
-	-@docker rm -f $$(docker ps -aq) > /dev/null 2>&1
+	@rm -fr $(FILES_TO_CLEAN)
+	@go mod tidy

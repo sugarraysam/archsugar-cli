@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
+	"github.com/sugarraysam/archsugar-cli/dotfiles"
 
 	"github.com/spf13/cobra"
 )
@@ -20,6 +21,11 @@ var (
 		Use:   "archsugar",
 		Short: "Ansible powered CLI to bootstrap and maintain a high-end archlinux workstation.",
 		Run:   rootMain,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			if cmd.CalledAs() != "init" {
+				checkDotfilesAreInitialized()
+			}
+		},
 	}
 )
 
@@ -50,5 +56,12 @@ func setLogLevel() {
 	}
 	if rootExtraVerbose {
 		log.SetLevel(log.TraceLevel)
+	}
+}
+
+func checkDotfilesAreInitialized() {
+	repo, err := dotfiles.NewRepo(dotfiles.DefaultURL, dotfiles.DefaultURL)
+	if err != nil || !repo.Exists() {
+		log.Fatalln("Please initialize the dotfiles repository using $ archsugar init")
 	}
 }

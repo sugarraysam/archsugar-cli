@@ -22,11 +22,11 @@ func init() {
 // also provide some helper funcs
 func TestMain(m *testing.M) {
 	// Setup - create new directory structure under /tmp
-	tmpDir := path.Join(os.TempDir(), "archsugar12345")
+	tmpDir := path.Join(os.TempDir(), fmt.Sprintf("archsugar-%d", helpers.GetRandomDigit()))
 	helpers.BaseDir = tmpDir
-	scenario.VarsBasedir = path.Join(tmpDir, "vars/master")
-	scenario.TasksBasedir = path.Join(tmpDir, "tasks/master")
-	scenario.EnabledBasedir = path.Join(tmpDir, "enabled")
+	scenario.VarsBasedir = path.Join(tmpDir, "roles/main/vars/master")
+	scenario.TasksBasedir = path.Join(tmpDir, "roles/main/tasks/master")
+	scenario.EnabledBasedir = path.Join(scenario.TasksBasedir, "enabled")
 
 	for _, path := range []string{
 		scenario.VarsBasedir,
@@ -47,9 +47,7 @@ func TestMain(m *testing.M) {
 }
 
 func getRandomName() string {
-	min, max := 10000, 20000
-	i := rand.Intn(min) + max - min
-	return fmt.Sprintf("neverdont-%d", i)
+	return fmt.Sprintf("neverdont-%d", helpers.GetRandomDigit())
 }
 
 var randomDescriptions = []string{

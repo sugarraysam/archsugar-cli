@@ -1,19 +1,20 @@
 package helpers
 
 import (
-	"fmt"
 	"path"
-	"runtime"
 
+	homedir "github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"
 )
 
+const ArchsugarDefaultPath = ".archsugar"
+
 var (
 	BaseDir string = func() string {
-		_, filename, linenum, ok := runtime.Caller(0)
-		if !ok {
-			log.Fatal(nil, fmt.Sprintf("runtime.Caller(0) failed: %v : %v", filename, linenum))
+		home, err := homedir.Dir()
+		if err != nil {
+			log.Fatalf("homdir.Dir(), got %v", err)
 		}
-		return path.Join(path.Dir(filename), "..")
+		return path.Join(home, ArchsugarDefaultPath)
 	}()
 )

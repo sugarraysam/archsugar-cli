@@ -1,17 +1,17 @@
 package helpers_test
 
 import (
-	"path"
-	"path/filepath"
+	"os/user"
 	"testing"
 
 	"github.com/sugarraysam/archsugar-cli/helpers"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBaseDir(t *testing.T) {
-	cwd, _ := filepath.Abs(".")
-	want := path.Dir(cwd)
-	assert.Equal(t, want, helpers.BaseDir)
+	user, err := user.Current()
+	require.Nil(t, err)
+	require.Contains(t, helpers.BaseDir, user.Username)
+	require.Contains(t, helpers.BaseDir, helpers.ArchsugarDefaultPath)
 }
