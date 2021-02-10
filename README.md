@@ -1,4 +1,4 @@
-# Archsugar [![Build Status](https://travis-ci.com/sugarraysam/archsugar.svg?branch=master)](https://travis-ci.com/github/sugarraysam/archsugar/builds) [![Go Report Card](https://goreportcard.com/badge/github.com/sugarraysam/archsugar)](https://goreportcard.com/report/github.com/sugarraysam/archsugar) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=archsugar&metric=alert_status)](https://sonarcloud.io/dashboard?id=archsugar)
+# Archsugar ![Pipeline](https://github.com/sugarraysam/archsugar-cli/workflows/ci/badge.svg?branch=dev) [![Go Report Card](https://goreportcard.com/badge/github.com/sugarraysam/archsugar-cli)](https://goreportcard.com/report/github.com/sugarraysam/archsugar-cli)
 
 ## Table of contents
 

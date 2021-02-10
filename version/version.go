@@ -1,10 +1,10 @@
 package version
 
 var (
-	// Version is a semantic version of current build
+	// Version - set by ldflag
 	Version = "unset"
-	// BuildTime is a time label of the moment when the binary was built
+	// BuildTime - set by ldflag
 	Date = "unset"
-	// Commit is a last commit hash at the moment when the binary was built
+	// Commit - set by ldflag
 	Commit = "unset"
 )
