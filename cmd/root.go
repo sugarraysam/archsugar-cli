@@ -22,7 +22,8 @@ var (
 		Short: "Ansible powered CLI to bootstrap and maintain a high-end archlinux workstation.",
 		Run:   rootMain,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if cmd.CalledAs() != "init" {
+			subcmd := cmd.CalledAs()
+			if subcmd != "init" && subcmd != "version" {
 				checkDotfilesAreInitialized()
 			}
 		},

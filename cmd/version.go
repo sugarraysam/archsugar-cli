@@ -15,8 +15,8 @@ var versionCmd = &cobra.Command{
 }
 
 func versionMain(cmd *cobra.Command, args []string) {
-	format := "Version: %s\nBuildTime: %s\nCommit: %s\n"
-	fmt.Printf(format, version.Version, version.BuildTime, version.Commit)
+	format := "Version: %s\nDate: %s\nCommit: %s\n"
+	fmt.Printf(format, version.Version, version.Date, version.Commit)
 }
 
 func init() {

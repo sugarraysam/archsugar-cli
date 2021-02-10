@@ -1,8 +1,8 @@
 # VScode
 .vscode/
 
-# Build directory
-_build/
+# Build directories, dist => goreleaser
+dist/
 
 # sonarqube
 .coverage.out

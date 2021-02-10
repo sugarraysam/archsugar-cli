@@ -1,4 +1,5 @@
-name: Go
+---
+name: ci
 
 on:
   push:
@@ -14,10 +15,10 @@ env:
 
 jobs:
   lint:
-    name: golangci-lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
@@ -27,15 +28,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.15
-    - name: Test
+
+    - name: test
       run: make test
+
     - name: SonarCloud Scan
-      if: ${{ github.event_name == 'pull_request' }}
       uses: SonarSource/sonarcloud-github-action@v1.5
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build:
+    runs-on: ubuntu-latest
+      needs: [lint, test]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # required for change log to work correctly
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Build /w goreleaser
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        version: latest
+        args: make build
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
