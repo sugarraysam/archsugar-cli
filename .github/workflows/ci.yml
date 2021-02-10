@@ -3,9 +3,9 @@ name: ci
 
 on:
   push:
-    branches: [ dev ]
+    branches: [dev]
   pull_request:
-    branches: [ dev, master ]
+    branches: [dev, master]
   # nightly builds @3am, on latest commit to default branch == 'dev'
   schedule:
     - cron: "0 3 * * *"
@@ -27,40 +27,40 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.15
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
 
-    - name: test
-      run: make test
+      - name: test
+        run: make test
 
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@v1.5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build:
     runs-on: ubuntu-latest
     needs: [lint, test]
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # required for change log to work correctly
-        fetch-depth: 0
+      - uses: actions/checkout@v2
+        with:
+          # required for change log to work correctly
+          fetch-depth: 0
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.15
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
 
-    - name: Build /w goreleaser
-      uses: goreleaser/goreleaser-action@v2
-      with:
-        version: latest
-        args: make build
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build /w goreleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: make build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
