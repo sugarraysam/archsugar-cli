@@ -1,4 +1,4 @@
-# Archsugar ![Pipeline](https://github.com/sugarraysam/archsugar-cli/workflows/ci/badge.svg?branch=dev) [![Go Report Card](https://goreportcard.com/badge/github.com/sugarraysam/archsugar-cli)](https://goreportcard.com/report/github.com/sugarraysam/archsugar-cli)
+# Archsugar ![Pipeline](https://github.com/sugarraysam/archsugar-cli/workflows/ci/badge.svg?branch=dev) [![Go Report Card](https://goreportcard.com/badge/github.com/sugarraysam/archsugar-cli)](https://goreportcard.com/report/github.com/sugarraysam/archsugar-cli) [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=sugarraysam_archsugar-cli)](https://sonarcloud.io/dashboard?id=sugarraysam_archsugar-cli)
 
 ## Table of contents
 
