@@ -7,6 +7,11 @@ export GOOS := linux
 export GOARCH := amd64
 BINARY := archsugar
 
+# goreleaser ldflags
+export VERSION := dev
+export COMMIT := $(shell git rev-parse --short HEAD)
+export DATE := $(shell date --rfc-3339=second)
+
 lint:
 	@golangci-lint run
 
@@ -16,7 +21,7 @@ test:
 	@go test -race >/dev/null 2>&1
 
 build:
-	@goreleaser release --skip-publish --snapshot --rm-dist
+	@goreleaser release --skip-publish --snapshot --rm-dist --debug
 
 install: build
 	@sudo install -Dm 755 dist/archsugar-cli_linux_amd64/$(BINARY) /usr/bin/$(BINARY)
