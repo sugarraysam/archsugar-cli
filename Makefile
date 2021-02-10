@@ -5,7 +5,7 @@ export SHELL := /bin/bash
 export GO111MODULE := on
 export GOOS := linux
 export GOARCH := amd64
-BINARY := archsugar-cli
+BINARY := archsugar
 
 lint:
 	@golangci-lint run
