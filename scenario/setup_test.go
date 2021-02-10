@@ -66,13 +66,16 @@ func getRandomDescription() string {
 
 // returns description and name
 func createRandomScenario(t *testing.T) (string, string) {
-	name := getRandomName()
-	desc := getRandomDescription()
-	s1, err := scenario.NewUncreatedScenario(name, desc)
-	require.Nil(t, err)
-	err = s1.Create()
-	require.Nil(t, err)
-	return name, desc
+	for {
+		name := getRandomName()
+		desc := getRandomDescription()
+		s, err := scenario.NewUncreatedScenario(name, desc)
+		// avoid flaky test with infrequent collisions in random names
+		if err == nil {
+			require.Nil(t, s.Create())
+			return name, desc
+		}
+	}
 }
 
 type dummyScenario struct {
