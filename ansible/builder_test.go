@@ -26,7 +26,7 @@ func TestBuilderCmd(t *testing.T) {
 		tc := tc
 		t.Run(tc.String(), func(t *testing.T) {
 			t.Parallel()
-			b := ansible.NewBuilder(tc, helpers.TmpDir())
+			b := ansible.NewBuilder(helpers.TmpDir(), tc)
 			cmd := b.Cmd()
 
 			// verify args
@@ -76,7 +76,7 @@ func TestCredCacheDisabled(t *testing.T) {
 		tc := tc
 		t.Run(tc.String(), func(t *testing.T) {
 			t.Parallel()
-			b := ansible.NewBuilder(tc, helpers.TmpDir())
+			b := ansible.NewBuilder(helpers.TmpDir(), tc)
 			require.False(t, b.IsCredCacheEnabled())
 			require.NotContains(t, b.Env(), fmt.Sprintf("ANSIBLE_VAULT_PASSWORD_FILE=%s", b.VaultPasswordFile))
 			require.Contains(t, b.Args(), ansible.BecomeFlag)
@@ -92,7 +92,7 @@ func TestCredCacheEnabled(t *testing.T) {
 
 			// setup & cleanup
 			tmpDir := helpers.TmpDir()
-			b := ansible.NewBuilder(tc, tmpDir)
+			b := ansible.NewBuilder(tmpDir, tc)
 			setupCredCache(t, b)
 			defer func() {
 				_ = os.RemoveAll(tmpDir)
@@ -117,7 +117,7 @@ func TestIsRoot(t *testing.T) {
 		tc := tc
 		t.Run(tc.String(), func(t *testing.T) {
 			t.Parallel()
-			b := ansible.NewBuilder(tc, helpers.TmpDir())
+			b := ansible.NewBuilder(helpers.TmpDir(), tc)
 			require.False(t, b.IsRoot())
 		})
 	}

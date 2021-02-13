@@ -25,12 +25,12 @@ type Builder struct {
 	GroupVarsDir      string
 }
 
-func NewBuilder(stage Stage, basePath string) *Builder {
+func NewBuilder(baseDir string, stage Stage) *Builder {
 	return &Builder{
 		Stage:             stage,
-		PlaybookPath:      path.Join(basePath, "playbook.yml"),
-		VaultPasswordFile: path.Join(basePath, "vault_password_file.sh"),
-		GroupVarsDir:      path.Join(basePath, "group_vars"),
+		PlaybookPath:      path.Join(baseDir, "playbook.yml"),
+		VaultPasswordFile: path.Join(baseDir, "vault_password_file.sh"),
+		GroupVarsDir:      path.Join(baseDir, "group_vars"),
 	}
 }
 

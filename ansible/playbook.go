@@ -41,16 +41,16 @@ func (p *Playbook) Name() string {
 }
 
 // NewBootstrap - returns a bootstrap playbook implementing AnsiblePlaybook
-func NewBootstrapPlaybook(basePath string) *Playbook {
-	return &Playbook{Builder: NewBuilder(BootstrapStage, basePath)}
+func NewBootstrapPlaybook(baseDir string) *Playbook {
+	return &Playbook{Builder: NewBuilder(baseDir, BootstrapStage)}
 }
 
 // NewChroot - returns bootstrap playbook implementing Playbook interface
-func NewChrootPlaybook(basePath string) *Playbook {
-	return &Playbook{Builder: NewBuilder(ChrootStage, basePath)}
+func NewChrootPlaybook(baseDir string) *Playbook {
+	return &Playbook{Builder: NewBuilder(baseDir, ChrootStage)}
 }
 
 // NewMaster - returns master playbook implementing Playbook interface
-func NewMasterPlaybook(basePath string) *Playbook {
-	return &Playbook{Builder: NewBuilder(MasterStage, basePath)}
+func NewMasterPlaybook(baseDir string) *Playbook {
+	return &Playbook{Builder: NewBuilder(baseDir, MasterStage)}
 }

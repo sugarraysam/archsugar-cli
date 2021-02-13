@@ -3,14 +3,8 @@ TARGETS := lint test build install uninstall clean
 
 export SHELL := /bin/bash
 export GO111MODULE := on
-export GOOS := linux
-export GOARCH := amd64
-BINARY := archsugar
 
-# goreleaser ldflags
-export VERSION := dev
-export COMMIT := $(shell git rev-parse --short HEAD)
-export DATE := $(shell date --rfc-3339=second)
+BINARY := archsugar
 
 lint:
 	@golangci-lint run

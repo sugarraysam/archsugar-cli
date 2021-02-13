@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 	"github.com/sugarraysam/archsugar-cli/scenario"
 )
 
@@ -28,7 +29,7 @@ var (
 )
 
 func listMain(cmd *cobra.Command, args []string) {
-	xs, err := scenario.GetAllScenarios()
+	xs, err := scenario.ReadAll(helpers.BaseDir)
 	if err != nil {
 		log.Fatalln("Could not get all scenarios:", err)
 	}

@@ -5,14 +5,6 @@ import (
 	"os"
 	"path"
 	"text/template"
-
-	"github.com/sugarraysam/archsugar-cli/helpers"
-)
-
-var (
-	VarsBasedir      = path.Join(helpers.BaseDir, "roles/main/vars/master")
-	TasksBasedir     = path.Join(helpers.BaseDir, "roles/main/tasks/master")
-	TemplatesBasedir = path.Join(helpers.BaseDir, "scenario/templates")
 )
 
 // AnsibleTemplate - represent a template to easily create scenarios
@@ -24,11 +16,11 @@ type AnsibleTemplate interface {
 }
 
 // NewVarsTemplate - used to create an Ansible variable file for a scenario from a go template
-func NewVarsTemplate(name string) AnsibleTemplate {
+func NewVarsTemplate(baseDir, name string) AnsibleTemplate {
 	return &tmpl{
 		Name: "Vars",
 		Src:  VarsTmpl,
-		Dst:  path.Join(VarsBasedir, fmt.Sprintf("%s.yml", name)),
+		Dst:  path.Join(VarsDir(baseDir), fmt.Sprintf("%s.yml", name)),
 		Data: map[string]string{
 			"Name": name,
 		},
@@ -36,11 +28,11 @@ func NewVarsTemplate(name string) AnsibleTemplate {
 }
 
 // NewTasksTemplate - used to create an Ansible tasks file for a scenario from a go template
-func NewTasksTemplate(name, desc string) AnsibleTemplate {
+func NewTasksTemplate(baseDir, name, desc string) AnsibleTemplate {
 	return &tmpl{
 		Name: "Tasks",
 		Src:  TasksTmpl,
-		Dst:  path.Join(TasksBasedir, fmt.Sprintf("%s.yml", name)),
+		Dst:  path.Join(TasksDir(baseDir), fmt.Sprintf("%s.yml", name)),
 		Data: map[string]string{
 			"Name": name,
 			"Desc": desc,
