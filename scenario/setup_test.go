@@ -22,7 +22,7 @@ func init() {
 // also provide some helper funcs
 func TestMain(m *testing.M) {
 	// Setup - create new directory structure under /tmp
-	tmpDir := path.Join(os.TempDir(), fmt.Sprintf("archsugar-%d", helpers.GetRandomDigit()))
+	tmpDir := path.Join(os.TempDir(), fmt.Sprintf("archsugar-%d", helpers.RandomDigit()))
 	helpers.BaseDir = tmpDir
 	scenario.VarsBasedir = path.Join(tmpDir, "roles/main/vars/master")
 	scenario.TasksBasedir = path.Join(tmpDir, "roles/main/tasks/master")
@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 }
 
 func getRandomName() string {
-	return fmt.Sprintf("neverdont-%d", helpers.GetRandomDigit())
+	return fmt.Sprintf("neverdont-%d", helpers.RandomDigit())
 }
 
 var randomDescriptions = []string{

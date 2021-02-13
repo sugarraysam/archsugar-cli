@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 	"github.com/sugarraysam/archsugar-cli/playbook"
 )
 
@@ -50,12 +51,12 @@ func bootstrapMain(cmd *cobra.Command, args []string) {
 	setBoostrapExtraEnv()
 
 	// Run bootstrap playbook
-	bootstrap := playbook.NewBootstrapPlaybook()
+	bootstrap := playbook.NewBootstrap(helpers.BaseDir)
 	if err := bootstrap.Run(); err != nil {
 		log.Fatalln("Error running bootstrap playbook:", err)
 	}
 	// Run chroot playbook
-	chroot := playbook.NewChrootPlaybook()
+	chroot := playbook.NewChroot(helpers.BaseDir)
 	if err := chroot.Run(); err != nil {
 		log.Fatalln("Error running chroot playbook:", err)
 	}

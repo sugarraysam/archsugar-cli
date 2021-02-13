@@ -1,8 +1,28 @@
 package helpers
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+	"os"
+	"path"
+)
 
-func GetRandomDigit() int {
-	min, max := 10000, 20000
-	return rand.Intn(min) + max - min
+const (
+	MinDigit = 10000
+	MaxDigit = 20000
+)
+
+// TmpDir - generate a tmpDir, avoiding very rare collisions
+func TmpDir() string {
+	for {
+		res := path.Join(os.TempDir(), fmt.Sprintf("archsugar-%d", RandomDigit()))
+		_, err := os.Stat(res)
+		if err != nil {
+			return res
+		}
+	}
+}
+
+func RandomDigit() int {
+	return rand.Intn(MinDigit) + MaxDigit - MinDigit
 }

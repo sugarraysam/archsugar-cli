@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 	"github.com/sugarraysam/archsugar-cli/playbook"
 )
 
@@ -32,7 +33,7 @@ var (
 
 func runMain(cmd *cobra.Command, args []string) {
 	setRunExtraEnv(args)
-	p := playbook.NewMasterPlaybook()
+	p := playbook.NewMaster(helpers.BaseDir)
 	if err := p.Run(); err != nil {
 		log.Fatalln("Error running master scenario:", err)
 	}

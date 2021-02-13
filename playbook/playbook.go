@@ -14,16 +14,17 @@ const (
 type AnsiblePlaybook interface {
 	Run() error
 	DryRun() error
+	Name() string
 }
 
 type playbook struct {
-	Stage Stage
+	Builder *Builder
 }
 
 func (p *playbook) Run() error {
-	cmd := p.Stage.Cmd()
+	cmd := p.Builder.Cmd()
 	log.WithFields(log.Fields{
-		"stage": p.Stage.String(),
+		"stage": p.Builder.Stage.String(),
 		"cmd":   cmd.Args,
 		"env":   cmd.Env,
 	}).Debug()
@@ -34,7 +35,7 @@ func (p *playbook) Run() error {
 }
 
 func (p *playbook) DryRun() error {
-	cmd := p.Stage.Cmd()
+	cmd := p.Builder.Cmd()
 	cmd.Args = append(cmd.Args, DryRunFlag)
 
 	cmd.Stdout = os.Stdout
@@ -42,17 +43,21 @@ func (p *playbook) DryRun() error {
 	return cmd.Run()
 }
 
-// NewBootstrapPlaybook - returns a bootstrap playbook implementing AnsiblePlaybook
-func NewBootstrapPlaybook() AnsiblePlaybook {
-	return &playbook{Stage: Bootstrap}
+func (p *playbook) Name() string {
+	return p.Builder.Stage.String()
 }
 
-// NewChrootPlaybook - returns bootstrap playbook implementing Playbook interface
-func NewChrootPlaybook() AnsiblePlaybook {
-	return &playbook{Stage: Chroot}
+// NewBootstrap - returns a bootstrap playbook implementing AnsiblePlaybook
+func NewBootstrap(basePath string) AnsiblePlaybook {
+	return &playbook{Builder: NewBuilder(Bootstrap, basePath)}
 }
 
-// NewMasterPlaybook - returns master playbook implementing Playbook interface
-func NewMasterPlaybook() AnsiblePlaybook {
-	return &playbook{Stage: Master}
+// NewChroot - returns bootstrap playbook implementing Playbook interface
+func NewChroot(basePath string) AnsiblePlaybook {
+	return &playbook{Builder: NewBuilder(Chroot, basePath)}
+}
+
+// NewMaster - returns master playbook implementing Playbook interface
+func NewMaster(basePath string) AnsiblePlaybook {
+	return &playbook{Builder: NewBuilder(Master, basePath)}
 }

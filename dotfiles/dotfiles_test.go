@@ -1,12 +1,8 @@
 package dotfiles_test
 
 import (
-	"fmt"
-	"math/rand"
 	"os"
-	"path"
 	"testing"
-	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/stretchr/testify/require"
@@ -14,33 +10,29 @@ import (
 	"github.com/sugarraysam/archsugar-cli/helpers"
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
-func TestMain(m *testing.M) {
-	// Setup - create new directory structure under /tmp
-	tmpDir := path.Join(os.TempDir(), fmt.Sprintf("archsugar-%d", helpers.GetRandomDigit()))
-	helpers.BaseDir = tmpDir
-
-	// Run
-	rc := m.Run()
-
-	// Teardown
-	_ = os.RemoveAll(tmpDir)
-	os.Exit(rc)
+func TestNewDefaultRepo(t *testing.T) {
+	repo := dotfiles.NewDefaultRepo()
+	require.Equal(t, repo.Dest, dotfiles.DefaultDest)
+	require.Equal(t, repo.URL, dotfiles.DefaultURL)
+	require.Equal(t, repo.Branch, dotfiles.DefaultBranch)
 }
 
 func TestArchsugarRepoCloneMasterAndDev(t *testing.T) {
+	// cleanup
+	tmpDir := helpers.TmpDir()
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
+
 	// clone master
-	master, err := dotfiles.NewRepo(dotfiles.DefaultURL, dotfiles.DefaultBranch)
+	master, err := dotfiles.NewRepo(tmpDir, dotfiles.DefaultURL, "master")
 	require.Nil(t, err)
 	require.Nil(t, master.Clone())
 	require.True(t, master.Exists())
-	validateBranch(t, master.Dst, "master")
+	validateBranch(t, master.Dest, "master")
 
 	// clone dev
-	dev, err := dotfiles.NewRepo(dotfiles.DefaultURL, "dev")
+	dev, err := dotfiles.NewRepo(tmpDir, dotfiles.DefaultURL, "dev")
 	require.Nil(t, err)
 
 	// repository already exists
@@ -51,7 +43,7 @@ func TestArchsugarRepoCloneMasterAndDev(t *testing.T) {
 	require.Nil(t, master.Rm())
 	require.Nil(t, dev.Clone())
 	require.True(t, dev.Exists())
-	validateBranch(t, dev.Dst, "dev")
+	validateBranch(t, dev.Dest, "dev")
 }
 
 func validateBranch(t *testing.T, path string, branch string) {
