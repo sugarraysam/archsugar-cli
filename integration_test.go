@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/sugarraysam/archsugar-cli/ansible"
 	"github.com/sugarraysam/archsugar-cli/dotfiles"
 	"github.com/sugarraysam/archsugar-cli/helpers"
-	"github.com/sugarraysam/archsugar-cli/playbook"
 )
 
 var (
@@ -19,25 +19,25 @@ var (
 func TestIntegration(t *testing.T) {
 	cases := []struct {
 		tmpDir string
-		pb     playbook.AnsiblePlaybook
+		p      *ansible.Playbook
 	}{
 		{
 			tmpDir: tmpDirBootstrap,
-			pb:     playbook.NewBootstrap(tmpDirBootstrap),
+			p:      ansible.NewBootstrapPlaybook(tmpDirBootstrap),
 		},
 		{
 
 			tmpDir: tmpDirChroot,
-			pb:     playbook.NewChroot(tmpDirChroot),
+			p:      ansible.NewChrootPlaybook(tmpDirChroot),
 		},
 		{
 			tmpDir: tmpDirMaster,
-			pb:     playbook.NewMaster(tmpDirMaster),
+			p:      ansible.NewMasterPlaybook(tmpDirMaster),
 		},
 	}
 	for _, tc := range cases {
 		tc := tc
-		t.Run(tc.pb.Name(), func(t *testing.T) {
+		t.Run(tc.p.Name(), func(t *testing.T) {
 			t.Parallel()
 
 			// setup & cleanup
@@ -45,7 +45,7 @@ func TestIntegration(t *testing.T) {
 			defer func() {
 				_ = os.RemoveAll(tc.tmpDir)
 			}()
-			require.Nil(t, tc.pb.DryRun())
+			require.Nil(t, tc.p.DryRun())
 		})
 	}
 }

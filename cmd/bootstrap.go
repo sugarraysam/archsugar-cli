@@ -8,8 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
+	"github.com/sugarraysam/archsugar-cli/ansible"
 	"github.com/sugarraysam/archsugar-cli/helpers"
-	"github.com/sugarraysam/archsugar-cli/playbook"
 )
 
 func init() {
@@ -50,15 +50,15 @@ func bootstrapMain(cmd *cobra.Command, args []string) {
 	// set args as env vars, will be added to Cmd Env
 	setBoostrapExtraEnv()
 
-	// Run bootstrap playbook
-	bootstrap := playbook.NewBootstrap(helpers.BaseDir)
+	// Run bootstrap ansible
+	bootstrap := ansible.NewBootstrapPlaybook(helpers.BaseDir)
 	if err := bootstrap.Run(); err != nil {
-		log.Fatalln("Error running bootstrap playbook:", err)
+		log.Fatalln("Error running bootstrap ansible:", err)
 	}
-	// Run chroot playbook
-	chroot := playbook.NewChroot(helpers.BaseDir)
+	// Run chroot ansible
+	chroot := ansible.NewChrootPlaybook(helpers.BaseDir)
 	if err := chroot.Run(); err != nil {
-		log.Fatalln("Error running chroot playbook:", err)
+		log.Fatalln("Error running chroot ansible:", err)
 	}
 }
 

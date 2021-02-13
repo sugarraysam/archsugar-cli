@@ -1,4 +1,4 @@
-package playbook
+package ansible
 
 import (
 	"fmt"
@@ -21,9 +21,9 @@ var (
 type Stage int
 
 const (
-	Bootstrap Stage = iota
-	Chroot
-	Master
+	BootstrapStage Stage = iota
+	ChrootStage
+	MasterStage
 )
 
 func (s Stage) String() string {
@@ -33,14 +33,14 @@ func (s Stage) String() string {
 func (s Stage) DefaultEnv() []string {
 	res := DefaultEnv
 	res = append(res, fmt.Sprintf("SUGAR_STAGE=%s", s.String()))
-	if s == Chroot {
+	if s == ChrootStage {
 		res = append(res, ChrootExtraEnv...)
 	}
 	return res
 }
 
 func (s Stage) DefaultArgs() []string {
-	if s == Chroot {
+	if s == ChrootStage {
 		return ChrootArgs
 	}
 	return DefaultArgs

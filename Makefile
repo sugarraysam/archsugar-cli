@@ -21,7 +21,7 @@ test:
 	@go test -race >/dev/null 2>&1
 
 build:
-	@goreleaser release --skip-publish --snapshot --rm-dist --debug
+	@goreleaser release --skip-publish --snapshot --rm-dist
 
 install: build
 	@sudo install -Dm 755 dist/archsugar-cli_linux_amd64/$(BINARY) /usr/bin/$(BINARY)

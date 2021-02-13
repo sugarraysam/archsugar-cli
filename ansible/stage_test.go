@@ -1,37 +1,37 @@
-package playbook_test
+package ansible_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/sugarraysam/archsugar-cli/playbook"
+	ansible "github.com/sugarraysam/archsugar-cli/ansible"
 )
 
 func TestStages(t *testing.T) {
 	cases := []struct {
-		stage          playbook.Stage
+		stage          ansible.Stage
 		expectedString string
 		expectedArgs   []string
 		expectedEnv    []string
 	}{
 		{
-			stage:          playbook.Bootstrap,
+			stage:          ansible.BootstrapStage,
 			expectedString: "bootstrap",
-			expectedArgs:   playbook.DefaultArgs,
-			expectedEnv:    playbook.DefaultEnv,
+			expectedArgs:   ansible.DefaultArgs,
+			expectedEnv:    ansible.DefaultEnv,
 		},
 		{
-			stage:          playbook.Chroot,
+			stage:          ansible.ChrootStage,
 			expectedString: "chroot",
-			expectedArgs:   playbook.ChrootArgs,
-			expectedEnv:    append(playbook.DefaultEnv, playbook.ChrootExtraEnv...),
+			expectedArgs:   ansible.ChrootArgs,
+			expectedEnv:    append(ansible.DefaultEnv, ansible.ChrootExtraEnv...),
 		},
 		{
-			stage:          playbook.Master,
+			stage:          ansible.MasterStage,
 			expectedString: "master",
-			expectedArgs:   playbook.DefaultArgs,
-			expectedEnv:    playbook.DefaultEnv,
+			expectedArgs:   ansible.DefaultArgs,
+			expectedEnv:    ansible.DefaultEnv,
 		},
 	}
 	for _, tc := range cases {

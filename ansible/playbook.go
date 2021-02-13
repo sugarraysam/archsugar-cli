@@ -1,4 +1,4 @@
-package playbook
+package ansible
 
 import (
 	"os"
@@ -10,18 +10,11 @@ const (
 	DryRunFlag = "--list-tasks"
 )
 
-// AnsiblePlaybook - represents a playbook that will be executed by the CLI
-type AnsiblePlaybook interface {
-	Run() error
-	DryRun() error
-	Name() string
-}
-
-type playbook struct {
+type Playbook struct {
 	Builder *Builder
 }
 
-func (p *playbook) Run() error {
+func (p *Playbook) Run() error {
 	cmd := p.Builder.Cmd()
 	log.WithFields(log.Fields{
 		"stage": p.Builder.Stage.String(),
@@ -34,7 +27,7 @@ func (p *playbook) Run() error {
 	return cmd.Run()
 }
 
-func (p *playbook) DryRun() error {
+func (p *Playbook) DryRun() error {
 	cmd := p.Builder.Cmd()
 	cmd.Args = append(cmd.Args, DryRunFlag)
 
@@ -43,21 +36,21 @@ func (p *playbook) DryRun() error {
 	return cmd.Run()
 }
 
-func (p *playbook) Name() string {
+func (p *Playbook) Name() string {
 	return p.Builder.Stage.String()
 }
 
 // NewBootstrap - returns a bootstrap playbook implementing AnsiblePlaybook
-func NewBootstrap(basePath string) AnsiblePlaybook {
-	return &playbook{Builder: NewBuilder(Bootstrap, basePath)}
+func NewBootstrapPlaybook(basePath string) *Playbook {
+	return &Playbook{Builder: NewBuilder(BootstrapStage, basePath)}
 }
 
 // NewChroot - returns bootstrap playbook implementing Playbook interface
-func NewChroot(basePath string) AnsiblePlaybook {
-	return &playbook{Builder: NewBuilder(Chroot, basePath)}
+func NewChrootPlaybook(basePath string) *Playbook {
+	return &Playbook{Builder: NewBuilder(ChrootStage, basePath)}
 }
 
 // NewMaster - returns master playbook implementing Playbook interface
-func NewMaster(basePath string) AnsiblePlaybook {
-	return &playbook{Builder: NewBuilder(Master, basePath)}
+func NewMasterPlaybook(basePath string) *Playbook {
+	return &Playbook{Builder: NewBuilder(MasterStage, basePath)}
 }
