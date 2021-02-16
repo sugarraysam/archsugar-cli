@@ -11,7 +11,7 @@ lint:
 
 test:
 	@go clean -testcache
-	@go test -covermode=count -coverprofile=.coverage.out -tags integration ./...
+	@go test -cover -tags integration ./...
 	@go test -race >/dev/null 2>&1
 
 build:
