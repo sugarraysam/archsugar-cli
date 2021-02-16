@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 	"github.com/sugarraysam/archsugar-cli/scenario"
 )
 
@@ -29,7 +30,7 @@ var (
 func rmMain(cmd *cobra.Command, args []string) {
 	// only allow removing a single scenario at a time
 	name := args[0]
-	s, err := scenario.NewCreatedScenario(name)
+	s, err := scenario.Read(helpers.BaseDir, name)
 	if err != nil {
 		log.Fatalln("Could not initialize scenario:", err)
 	}

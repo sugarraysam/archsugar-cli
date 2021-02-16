@@ -40,13 +40,13 @@ var (
 )
 
 func initMain(cmd *cobra.Command, args []string) {
-	repo, err := dotfiles.NewRepo(initURL, initBranch)
+	repo, err := dotfiles.NewRepo(dotfiles.DefaultDest, initURL, initBranch)
 	if err != nil {
 		log.Fatalln("Could not initialize dotfiles repo:", err)
 	}
 	if repo.Exists() {
 		if !initForce {
-			log.Fatalf("A repository already exists at %s, add --force to overwrite it.", repo.Dst)
+			log.Fatalf("A repository already exists at %s, add --force to overwrite it.", repo.Dest)
 		}
 		if err = repo.Rm(); err != nil {
 			log.Fatalln("Could not overwrite existing dotfiles repo:", err)

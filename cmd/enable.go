@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 	"github.com/sugarraysam/archsugar-cli/scenario"
 )
 
@@ -53,7 +54,7 @@ func enableMain(cmd *cobra.Command, args []string) {
 }
 
 func enableAllScenarios() {
-	xs, err := scenario.GetAllScenarios()
+	xs, err := scenario.ReadAll(helpers.BaseDir)
 	if err != nil {
 		log.Fatalln("Could not initialize all scenarios:", err)
 	}
@@ -64,7 +65,7 @@ func enableAllScenarios() {
 
 func enableAllFromArgs(args []string) {
 	for _, name := range args {
-		s, err := scenario.NewCreatedScenario(name)
+		s, err := scenario.Read(helpers.BaseDir, name)
 		if err != nil {
 			log.Fatalln("Could not initialize scenario:", err)
 		}

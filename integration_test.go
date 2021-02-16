@@ -1,54 +1,57 @@
 package main_test
 
 import (
-	"fmt"
-	"math/rand"
 	"os"
-	"path"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/sugarraysam/archsugar-cli/ansible"
 	"github.com/sugarraysam/archsugar-cli/dotfiles"
 	"github.com/sugarraysam/archsugar-cli/helpers"
-	"github.com/sugarraysam/archsugar-cli/playbook"
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
-func TestMain(m *testing.M) {
-	// Setup - create new directory structure under /tmp
-	tmpDir := path.Join(os.TempDir(), fmt.Sprintf("archsugar-%d", helpers.GetRandomDigit()))
-	helpers.BaseDir = tmpDir
-	playbook.PlaybookPath = path.Join(helpers.BaseDir, "playbook.yml")
-
-	// Run
-	rc := m.Run()
-
-	// Teardown
-	_ = os.RemoveAll(tmpDir)
-	os.Exit(rc)
-}
+var (
+	tmpDirBootstrap = helpers.TmpDir()
+	tmpDirChroot    = helpers.TmpDir()
+	tmpDirMaster    = helpers.TmpDir()
+)
 
 func TestIntegration(t *testing.T) {
-	// clone dotfiles to helpers.BaseDir
-	repo, err := dotfiles.NewRepo(dotfiles.DefaultURL, "dev")
-	require.Nil(t, err)
-	require.Nil(t, repo.Clone())
+	cases := []struct {
+		tmpDir string
+		p      *ansible.Playbook
+	}{
+		{
+			tmpDir: tmpDirBootstrap,
+			p:      ansible.NewBootstrapPlaybook(tmpDirBootstrap),
+		},
+		{
 
-	playbooks := map[string]playbook.AnsiblePlaybook{
-		"bootstrap": playbook.NewBootstrapPlaybook(),
-		"chroot":    playbook.NewChrootPlaybook(),
-		"master":    playbook.NewMasterPlaybook(),
+			tmpDir: tmpDirChroot,
+			p:      ansible.NewChrootPlaybook(tmpDirChroot),
+		},
+		{
+			tmpDir: tmpDirMaster,
+			p:      ansible.NewMasterPlaybook(tmpDirMaster),
+		},
 	}
-
-	for name, playbook := range playbooks {
-		playbook := playbook
-		t.Run(name, func(t *testing.T) {
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.p.Name(), func(t *testing.T) {
 			t.Parallel()
-			require.Nil(t, playbook.DryRun())
+
+			// setup & cleanup
+			setup(t, tc.tmpDir)
+			defer func() {
+				_ = os.RemoveAll(tc.tmpDir)
+			}()
+			require.Nil(t, tc.p.DryRun())
 		})
 	}
+}
+
+func setup(t *testing.T, tmpDir string) {
+	repo, err := dotfiles.NewRepo(tmpDir, dotfiles.DefaultURL, "dev")
+	require.Nil(t, err)
+	require.Nil(t, repo.Clone())
 }

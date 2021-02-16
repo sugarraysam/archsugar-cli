@@ -11,20 +11,11 @@ import (
 )
 
 var (
-	EnabledBasedir          = path.Join(TasksBasedir, "enabled")
-	ErrScenarioDoesNotExist = errors.New("scenario does not exist")
+	ErrScenarioAlreadyExists = errors.New("scenario is already created")
+	ErrScenarioDoesNotExist  = errors.New("scenario does not exist")
 )
 
-type CreatedScenario interface {
-	Rm() error
-	Enable() error
-	Disable() error
-	GetName() string
-	GetDesc() string
-	IsEnabled() bool
-}
-
-type cscenario struct {
+type Scenario struct {
 	Name           string
 	Desc           string
 	Templates      map[string]AnsibleTemplate
@@ -32,32 +23,47 @@ type cscenario struct {
 	Enabled        bool
 }
 
-// NewCreatedScenario - returns a CreatedScenario and validates if it is created
-func NewCreatedScenario(name string) (CreatedScenario, error) {
-	s := &cscenario{
+// New - writes scenario templates to filesystem
+func New(baseDir, name, desc string) (*Scenario, error) {
+	s := base(baseDir, name, desc)
+	for _, t := range s.Templates {
+		if t.Exists() {
+			return nil, ErrScenarioAlreadyExists
+		}
+		if err := t.Write(); err != nil {
+			return nil, err
+		}
+	}
+	return s, nil
+}
+
+func base(baseDir, name, desc string) *Scenario {
+	return &Scenario{
 		Name: name,
-		Desc: "",
+		Desc: desc,
 		Templates: map[string]AnsibleTemplate{
-			"vars":  NewVarsTemplate(name),
-			"tasks": NewTasksTemplate(name, ""),
+			"vars":  NewVarsTemplate(baseDir, name),
+			"tasks": NewTasksTemplate(baseDir, name, desc),
 		},
-		EnabledSymlink: path.Join(EnabledBasedir, fmt.Sprintf("%s.yml", name)),
+		EnabledSymlink: path.Join(EnabledDir(baseDir), fmt.Sprintf("%s.yml", name)),
 		Enabled:        false,
 	}
+}
+
+// Read - initialize a scenario struct from filesystem
+func Read(baseDir, name string) (*Scenario, error) {
+	s := base(baseDir, name, "")
 	for _, t := range s.Templates {
 		if !t.Exists() {
 			return nil, ErrScenarioDoesNotExist
 		}
 	}
-	// reads in the description from the existing ansible task file
-	s.setDesc()
-	if _, err := os.Lstat(s.EnabledSymlink); err == nil {
-		s.Enabled = true
-	}
+	s.readDesc()
+	s.setEnabled()
 	return s, nil
 }
 
-func (s *cscenario) setDesc() {
+func (s *Scenario) readDesc() {
 	taskFile, err := os.Open(s.Templates["tasks"].GetDst())
 	if err != nil {
 		return
@@ -71,8 +77,14 @@ func (s *cscenario) setDesc() {
 	s.Desc = strings.Trim(desc, "# \n")
 }
 
+func (s *Scenario) setEnabled() {
+	if _, err := os.Lstat(s.EnabledSymlink); err == nil {
+		s.Enabled = true
+	}
+}
+
 // Rm - deletes a CreatedScenario
-func (s *cscenario) Rm() error {
+func (s *Scenario) Rm() error {
 	if s.Enabled {
 		if err := s.Disable(); err != nil {
 			return err
@@ -87,7 +99,7 @@ func (s *cscenario) Rm() error {
 }
 
 // Enable - enables the scenario by writing the EnabledSymlink
-func (s *cscenario) Enable() error {
+func (s *Scenario) Enable() error {
 	if s.Enabled {
 		return nil
 	}
@@ -100,7 +112,7 @@ func (s *cscenario) Enable() error {
 }
 
 // Disable - disables the scenario by removing the EnabledSymlink
-func (s *cscenario) Disable() error {
+func (s *Scenario) Disable() error {
 	if !s.Enabled {
 		return nil
 	}
@@ -111,17 +123,15 @@ func (s *cscenario) Disable() error {
 	return nil
 }
 
-// GetName - return name of scenario
-func (s *cscenario) GetName() string {
-	return s.Name
-}
-
-// GetDesc - return description of scenario
-func (s *cscenario) GetDesc() string {
-	return s.Desc
-}
-
-// IsEnabled - returns wheter scenario is enabled or not
-func (s *cscenario) IsEnabled() bool {
+func (s *Scenario) IsEnabled() bool {
 	return s.Enabled
+}
+
+func (s *Scenario) Exists() bool {
+	for _, t := range s.Templates {
+		if !t.Exists() {
+			return false
+		}
+	}
+	return true
 }

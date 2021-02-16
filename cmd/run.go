@@ -8,7 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
-	"github.com/sugarraysam/archsugar-cli/playbook"
+	"github.com/sugarraysam/archsugar-cli/ansible"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 )
 
 func init() {
@@ -32,7 +33,7 @@ var (
 
 func runMain(cmd *cobra.Command, args []string) {
 	setRunExtraEnv(args)
-	p := playbook.NewMasterPlaybook()
+	p := ansible.NewMasterPlaybook(helpers.BaseDir)
 	if err := p.Run(); err != nil {
 		log.Fatalln("Error running master scenario:", err)
 	}

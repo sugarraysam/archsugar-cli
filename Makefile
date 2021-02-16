@@ -3,8 +3,7 @@ TARGETS := lint test build install uninstall clean
 
 export SHELL := /bin/bash
 export GO111MODULE := on
-export GOOS := linux
-export GOARCH := amd64
+
 BINARY := archsugar
 
 lint:
@@ -12,7 +11,7 @@ lint:
 
 test:
 	@go clean -testcache
-	@go test -covermode=count -coverprofile=.coverage.out -tags integration ./...
+	@go test -cover -tags integration ./...
 	@go test -race >/dev/null 2>&1
 
 build:

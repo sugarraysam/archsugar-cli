@@ -13,7 +13,7 @@ var (
 	BaseDir string = func() string {
 		home, err := homedir.Dir()
 		if err != nil {
-			log.Fatalf("homdir.Dir(), got %v", err)
+			log.Fatalf("homedir.Dir(), got %v", err)
 		}
 		return path.Join(home, ArchsugarDefaultPath)
 	}()

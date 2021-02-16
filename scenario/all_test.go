@@ -1,122 +1,105 @@
 package scenario_test
 
 import (
-	"bufio"
 	"sort"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 	"github.com/sugarraysam/archsugar-cli/scenario"
 )
 
-func TestGetAllScenarios(t *testing.T) {
+func TestReadAllScenarios(t *testing.T) {
 	// Create 'n' scenarios, and save name + desc in a map
-	n := 7
+	n := 5
 	expected := make(map[string]string)
 	for i := 0; i < n; i++ {
-		name, desc := createRandomScenario(t)
-		expected[name] = desc
+		s, err := helpers.CreateRandomScenario(t, TmpDir)
+		require.Nil(t, err)
+		expected[s.Name] = s.Desc
 	}
 
-	xs, err := scenario.GetAllScenarios()
+	xs, err := scenario.ReadAll(TmpDir)
 	require.Nil(t, err)
-	for _, s := range xs.GetScenarios() {
-		assert.Equal(t, expected[s.GetName()], s.GetDesc())
-		// Clean
-		err = s.Rm()
-		require.Nil(t, err)
+	for _, s := range xs {
+		require.Equal(t, expected[s.Name], s.Desc)
+		require.Nil(t, s.Rm())
 	}
 }
 
-func TestGetAllScenariosAreSorted(t *testing.T) {
+func TestAllScenariosAreSorted(t *testing.T) {
 	// Create 'n' scenarios, and save names
-	n := 7
+	n := 5
 	var expected []string
 	for i := 0; i < n; i++ {
-		name, _ := createRandomScenario(t)
-		expected = append(expected, name)
+		s, err := helpers.CreateRandomScenario(t, TmpDir)
+		require.Nil(t, err)
+		expected = append(expected, s.Name)
 	}
 	sort.Strings(expected)
 
-	xs, err := scenario.GetAllScenarios()
+	xs, err := scenario.ReadAll(TmpDir)
 	require.Nil(t, err)
 	var names []string
-	for _, s := range xs.GetScenarios() {
-		names = append(names, s.GetName())
-		// Clean
-		err = s.Rm()
-		require.Nil(t, err)
+	for _, s := range xs {
+		names = append(names, s.Name)
+		require.Nil(t, s.Rm())
 	}
 	assert.Equal(t, names, expected)
 }
 
 func TestListOutput(t *testing.T) {
-	// init n dummyScenarios ++ sort
-	n := 7
-	var expected dummyScenarios
+	// create n scenarios
+	n := 5
+	var expected []*scenario.Scenario
 	for i := 0; i < n; i++ {
-		expected = append(expected, newRandomDummyScenario(t))
+		s, err := helpers.CreateRandomScenario(t, TmpDir)
+		require.Nil(t, err)
+		expected = append(expected, s)
 	}
-	sort.Sort(expected)
 
-	// list all scenarios to my writer
-	xs, err := scenario.GetAllScenarios()
+	// verify all created scenarios Name present in output
+	xs, err := scenario.ReadAll(TmpDir)
 	require.Nil(t, err)
-	require.Equal(t, len(expected), len(xs.GetScenarios()))
+	require.Equal(t, len(expected), len(xs))
 	var b strings.Builder
-	err = xs.List(&b)
-	require.Nil(t, err)
-
-	// verify list output is accurate
-	scanner := bufio.NewScanner(strings.NewReader(b.String()))
-	for _, expectedLine := range []string{scenario.Header, scenario.Separator} {
-		scanner.Scan()
-		require.True(t, strings.HasPrefix(scanner.Text(), expectedLine))
+	require.Nil(t, xs.List(&b))
+	out := b.String()
+	for _, s := range expected {
+		require.Contains(t, out, s.Name)
 	}
-	for i := 0; i < len(expected) && scanner.Scan(); i++ {
-		tc := expected[i]
-		expectedLine := scenario.FormatLine(tc.name, scenario.DisabledToken, tc.desc)
-		if tc.enabled {
-			expectedLine = scenario.FormatLine(tc.name, scenario.EnabledToken, tc.desc)
-		}
-		require.True(t, strings.HasPrefix(scanner.Text(), expectedLine))
-	}
-	require.Nil(t, scanner.Err())
 
 	// clean
-	for _, s := range xs.GetScenarios() {
-		err = s.Rm()
-		require.Nil(t, err)
+	for _, s := range xs {
+		require.Nil(t, s.Rm())
 	}
 }
 
-func TestEnableAndDisableAll(t *testing.T) {
-	n := 10
+func TestEnableAllAndDisableAll(t *testing.T) {
+	n := 5
 	for i := 0; i < n; i++ {
-		_, _ = createRandomScenario(t)
+		_, _ = helpers.CreateRandomScenario(t, TmpDir)
 	}
-	xs, err := scenario.GetAllScenarios()
+	xs, err := scenario.ReadAll(TmpDir)
 	require.Nil(t, err)
-	for _, s := range xs.GetScenarios() {
+	for _, s := range xs {
 		require.False(t, s.IsEnabled())
 	}
 
 	// EnableAll
-	err = xs.EnableAll()
-	require.Nil(t, err)
-	for _, s := range xs.GetScenarios() {
+	require.Nil(t, xs.EnableAll())
+	for _, s := range xs {
 		require.True(t, s.IsEnabled())
 	}
 
 	// DisableAll
-	err = xs.DisableAll()
-	require.Nil(t, err)
-	for _, s := range xs.GetScenarios() {
+	require.Nil(t, xs.DisableAll())
+	for _, s := range xs {
 		require.False(t, s.IsEnabled())
+
 		// clean
-		err = s.Rm()
-		require.Nil(t, err)
+		require.Nil(t, s.Rm())
 	}
 }

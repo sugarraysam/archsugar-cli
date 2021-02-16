@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 	"github.com/sugarraysam/archsugar-cli/scenario"
 )
 
@@ -32,11 +33,8 @@ var (
 
 func createMain(cmd *cobra.Command, args []string) {
 	name := args[0]
-	s, err := scenario.NewUncreatedScenario(name, createDesc)
+	_, err := scenario.New(helpers.BaseDir, name, createDesc)
 	if err != nil {
-		log.Fatalln("Could not initialize scneario:", err)
-	}
-	if err := s.Create(); err != nil {
 		log.Fatalln("Could not create scenario:", err)
 	}
 }

@@ -1,6 +1,7 @@
 package dotfiles
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -11,40 +12,46 @@ import (
 	"github.com/sugarraysam/archsugar-cli/helpers"
 )
 
-const (
+var (
 	DefaultURL    = "https://github.com/sugarraysam/archsugar"
+	DefaultDest   = helpers.BaseDir
 	DefaultBranch = "master"
 )
 
 type Repo struct {
+	Dest   string
 	URL    string
-	Dst    string
 	Branch string
 }
 
-func NewRepo(rawURL, branch string) (*Repo, error) {
-	if rawURL == "" {
-		rawURL = DefaultURL
+func NewDefaultRepo() *Repo {
+	return &Repo{
+		Dest:   DefaultDest,
+		URL:    DefaultURL,
+		Branch: DefaultBranch,
+	}
+}
+
+func NewRepo(dest, rawURL, branch string) (*Repo, error) {
+	if rawURL == "" || dest == "" || branch == "" {
+		return nil, errors.New("some or multiple invalid empty arguments")
 	}
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, err
 	}
-	if branch == "" {
-		branch = DefaultBranch
-	}
 	return &Repo{
+		Dest:   dest,
 		URL:    u.String(),
-		Dst:    helpers.BaseDir,
 		Branch: branch,
 	}, nil
 }
 
 func (r *Repo) Clone() error {
 	if r.Exists() {
-		return fmt.Errorf("could not clone, repository already exists at: %s", r.Dst)
+		return fmt.Errorf("could not clone, repository already exists at: %s", r.Dest)
 	}
-	_, err := git.PlainClone(r.Dst, false, &git.CloneOptions{
+	_, err := git.PlainClone(r.Dest, false, &git.CloneOptions{
 		URL:           r.URL,
 		ReferenceName: plumbing.NewBranchReferenceName(r.Branch),
 		Depth:         1,
@@ -57,10 +64,10 @@ func (r *Repo) Clone() error {
 }
 
 func (r *Repo) Exists() bool {
-	_, err := os.Stat(r.Dst)
+	_, err := os.Stat(r.Dest)
 	return err == nil
 }
 
 func (r *Repo) Rm() error {
-	return os.RemoveAll(helpers.BaseDir)
+	return os.RemoveAll(r.Dest)
 }

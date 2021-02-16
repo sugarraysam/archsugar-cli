@@ -4,8 +4,12 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/sugarraysam/archsugar-cli/version"
 )
+
+// Set by ldflags
+var version = "unset"
+var commit = "unset"
+var date = "unset"
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
@@ -16,7 +20,7 @@ var versionCmd = &cobra.Command{
 
 func versionMain(cmd *cobra.Command, args []string) {
 	format := "Version: %s\nDate: %s\nCommit: %s\n"
-	fmt.Printf(format, version.Version, version.Date, version.Commit)
+	fmt.Printf(format, version, date, commit)
 }
 
 func init() {

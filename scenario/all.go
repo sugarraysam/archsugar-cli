@@ -11,7 +11,6 @@ const (
 	MaxLineLen    = 100
 	EnabledToken  = "   X   "
 	DisabledToken = " "
-	MainTaskFile  = "main.yml"
 )
 
 var (
@@ -19,30 +18,22 @@ var (
 	Separator = strings.Repeat("-", MaxLineLen)
 )
 
-type AllScenarios interface {
-	List(w io.Writer) error
-	DisableAll() error
-	EnableAll() error
-	GetScenarios() []CreatedScenario
-}
+type scenarios []*Scenario
 
-type scenarios []CreatedScenario
-
-// GetAllScenarios - returns all created scenarios, sorted by name
-func GetAllScenarios() (AllScenarios, error) {
+// ReadAll - returns all created scenarios, sorted by name
+func ReadAll(baseDir string) (scenarios, error) {
 	var xs scenarios
-	files, err := ioutil.ReadDir(TasksBasedir)
+	files, err := ioutil.ReadDir(TasksDir(baseDir))
 	if err != nil {
 		return nil, err
 	}
 	for _, f := range files {
-		if f.IsDir() || f.Name() == MainTaskFile {
+		if f.IsDir() || f.Name() == "main.yml" {
 			continue
 		}
 		// no concurrency to keep scenarios in sorted order (from ioutil.ReadDir)
-		// also, plus there should not be more than 30 scenarios at any point
 		name := strings.TrimSuffix(f.Name(), ".yml")
-		scenario, err := NewCreatedScenario(name)
+		scenario, err := Read(baseDir, name)
 		if err != nil {
 			return nil, err
 		}
@@ -57,9 +48,9 @@ func (xs scenarios) List(w io.Writer) error {
 		return err
 	}
 	for _, s := range xs {
-		line := FormatLine(s.GetName(), DisabledToken, s.GetDesc())
+		line := FormatLine(s.Name, DisabledToken, s.Desc)
 		if s.IsEnabled() {
-			line = FormatLine(s.GetName(), EnabledToken, s.GetDesc())
+			line = FormatLine(s.Name, EnabledToken, s.Desc)
 		}
 		if _, err := fmt.Fprintln(w, line); err != nil {
 			return err
@@ -114,9 +105,4 @@ func (xs scenarios) EnableAll() error {
 		}
 	}
 	return nil
-}
-
-// GetScenarios - returns underlying scenarios
-func (xs scenarios) GetScenarios() []CreatedScenario {
-	return xs
 }

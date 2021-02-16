@@ -2,19 +2,22 @@ package cmd
 
 import (
 	"os"
+	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
-	"github.com/sugarraysam/archsugar-cli/playbook"
+	"github.com/sugarraysam/archsugar-cli/ansible"
+	"github.com/sugarraysam/archsugar-cli/helpers"
 )
 
 func init() {
 	bootstrapCmd.Flags().StringVar(&bootstrapDisk, "disk", bootstrapDisk, "root disk to use for partitioning")
-	bootstrapCmd.Flags().StringVar(&bootstrapLuksPasswd, "luks", bootstrapLuksPasswd, "luksPasswd used to encrypt disk")
-	bootstrapCmd.Flags().StringVar(&bootstrapRootPasswd, "root", bootstrapRootPasswd, "password of root user")
-	bootstrapCmd.Flags().StringVar(&bootstrapUserPasswd, "user", bootstrapUserPasswd, "password of unpriviledged user")
+	bootstrapCmd.Flags().StringVar(&bootstrapLuksPasswd, "luksPasswd", bootstrapLuksPasswd, "LUKS Password used to encrypt disk")
+	bootstrapCmd.Flags().StringVar(&bootstrapRootPasswd, "rootPasswd", bootstrapRootPasswd, "password of root user")
+	bootstrapCmd.Flags().StringVar(&bootstrapUserPasswd, "userPasswd", bootstrapUserPasswd, "password of unpriviledged user")
+	bootstrapCmd.Flags().BoolVar(&bootstrapVagrant, "vagrant", bootstrapVagrant, "Bootstrap VM as a vagrant box")
 	rootCmd.AddCommand(bootstrapCmd)
 }
 
@@ -24,17 +27,19 @@ var (
 	bootstrapLuksPasswd = "luks"
 	bootstrapRootPasswd = "root"
 	bootstrapUserPasswd = "sugar"
+	bootstrapVagrant    = false
 
 	// Examples
 	bootstrapExamples = []string{
-		"  # Run a bootstrap playbook with default args",
-		"  archsugar bootstrap",
-		"  # Run a bootstrap playbook by specifying all parameters",
+		"  # Bootstrap a VM as a vagrant box",
+		"  # luksPasswd, rootPasswd, userPasswd and username will all be set to 'vagrant'",
+		"  archsugar bootstrap --disk /dev/sda --vagrant",
+		"  # Bootstrap a bare-metal computer",
 		"  archsugar bootstrap --disk /dev/sda --luksPasswd luks --rootPasswd root --userPasswd user",
 	}
 	bootstrapCmd = &cobra.Command{
-		Use:     "bootstrap [--disk <disk> --luksPasswd <luks> --rootPasswd <root> --userPasswd <user>]",
-		Short:   "Run bootstrap and chroot stage to provision new bare machine or VM",
+		Use:     "bootstrap --disk <disk> [ --luksPasswd <luks> --rootPasswd <root> --userPasswd <user> | --vagrant ]",
+		Short:   "Run bootstrap and chroot stage to provision a bare-metal machine or a VM",
 		Example: strings.Join(bootstrapExamples, "\n"),
 		Run:     bootstrapMain,
 		Args:    cobra.NoArgs,
@@ -45,21 +50,29 @@ func bootstrapMain(cmd *cobra.Command, args []string) {
 	// set args as env vars, will be added to Cmd Env
 	setBoostrapExtraEnv()
 
-	// Run bootstrap playbook
-	bootstrap := playbook.NewBootstrapPlaybook()
+	// Run bootstrap ansible
+	bootstrap := ansible.NewBootstrapPlaybook(helpers.BaseDir)
 	if err := bootstrap.Run(); err != nil {
-		log.Fatalln("Error running bootstrap playbook:", err)
+		log.Fatalln("Error running bootstrap ansible:", err)
 	}
-	// Run chroot playbook
-	chroot := playbook.NewChrootPlaybook()
+	// Run chroot ansible
+	chroot := ansible.NewChrootPlaybook(helpers.BaseDir)
 	if err := chroot.Run(); err != nil {
-		log.Fatalln("Error running chroot playbook:", err)
+		log.Fatalln("Error running chroot ansible:", err)
 	}
 }
 
 func setBoostrapExtraEnv() {
 	os.Setenv("SUGAR_DISK", bootstrapDisk)
-	os.Setenv("SUGAR_LUKS_PASSWD", bootstrapLuksPasswd)
-	os.Setenv("SUGAR_ROOT_PASSWD", bootstrapRootPasswd)
-	os.Setenv("SUGAR_USER_PASSWD", bootstrapUserPasswd)
+	os.Setenv("SUGAR_VAGRANT", strconv.FormatBool(bootstrapVagrant))
+	if bootstrapVagrant {
+		os.Setenv("SUGAR_LUKS_PASSWD", "vagrant")
+		os.Setenv("SUGAR_ROOT_PASSWD", "vagrant")
+		os.Setenv("SUGAR_USER_PASSWD", "vagrant")
+		os.Setenv("SUGAR_USER", "vagrant")
+	} else {
+		os.Setenv("SUGAR_LUKS_PASSWD", bootstrapLuksPasswd)
+		os.Setenv("SUGAR_ROOT_PASSWD", bootstrapRootPasswd)
+		os.Setenv("SUGAR_USER_PASSWD", bootstrapUserPasswd)
+	}
 }

@@ -61,8 +61,7 @@ func setLogLevel() {
 }
 
 func checkDotfilesAreInitialized() {
-	repo, err := dotfiles.NewRepo(dotfiles.DefaultURL, dotfiles.DefaultURL)
-	if err != nil || !repo.Exists() {
+	if !dotfiles.NewDefaultRepo().Exists() {
 		log.Fatalln("Please initialize the dotfiles repository using $ archsugar init")
 	}
 }
