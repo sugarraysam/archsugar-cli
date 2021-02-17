@@ -7,7 +7,7 @@ var TasksTmpl = `# (( .Desc ))
 - include_role:
     name: scenario
   vars:
-    pacman_pks: "{{ (( .Name ))_pacman_pkgs }}"
+    pacman_pkgs: "{{ (( .Name ))_pacman_pkgs }}"
     dirs_user: "{{ (( .Name ))_dirs_user }}"
     dirs_root: "{{ (( .Name ))_dirs_root }}"
     dotfiles_user: "{{ (( .Name ))_dotfiles_user }}"

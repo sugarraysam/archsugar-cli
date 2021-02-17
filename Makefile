@@ -18,11 +18,11 @@ build:
 	@goreleaser release --skip-publish --snapshot --rm-dist
 
 install: build
-	@sudo install -Dm 755 dist/archsugar-cli_linux_amd64/$(BINARY) /usr/bin/$(BINARY)
-	@/usr/bin/$(BINARY) completion | sudo install -Dm 644 /dev/stdin /usr/share/zsh/site-functions/_$(BINARY)
+	@sudo install -Dm 755 dist/archsugar-cli_linux_amd64/$(BINARY) /usr/local/bin/$(BINARY)
+	@/usr/local/bin/$(BINARY) completion | sudo install -Dm 644 /dev/stdin /usr/share/zsh/site-functions/_$(BINARY)
 
 uninstall:
-	-@sudo rm -f /usr/bin/$(BINARY) /usr/share/zsh/site-functions/_$(BINARY) > /dev/null 2>&1
+	-@sudo rm -f /usr/local/bin/$(BINARY) /usr/share/zsh/site-functions/_$(BINARY) > /dev/null 2>&1
 
 FILES_TO_CLEAN := $(shell find . -type d -name dist)
 clean:
