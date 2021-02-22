@@ -12,23 +12,47 @@
 
 ## Prerequisites
 
-- A computer!! duhh
 - Burn the latest [ArchLinux iso](https://www.archlinux.org/download/) on a flash drive
 - Boot the computer using the flash drive
+  a. Disable Secure Boot
+  b. Disable corporate rootkits
 - Configure networking (recommended to use Ethernet). Here is one one to do it:
 
-**Configure network interfaces**
+### Configure network interface
+
+**1. Ethernet**
 
 ```bash
 $ export IFACE=ethXX
-$ cat >"/etc/systemd/network/${IFACE}.network" <<EOF
+$ cat >"/etc/systemd/network/00-${IFACE}.network" <<EOF
 [Match]
 Name=${IFACE}
 
 [Network]
 DHCP=ipv4
 EOF
+
 $ systemctl restart systemd-networkd
+```
+
+**2. Wifi**
+
+```bash
+$ export SSID=<ssid>
+$ export PASSWD=<passwd>
+$ export IFACE=wlanX
+
+$ wpa_passphrase ${SSID} ${PASSWD} | tee /etc/wpa_supplicant/wpa_supplicant-${IFACE}.conf
+$ cat >"/etc/systemd/network/00-${IFACE}.network" <<EOF
+[Match]
+Name=${IFACE}
+
+[Network]
+DHCP=ipv4
+EOF
+
+$ systemctl restart systemd-networkd
+$ systemctl restart wpa_supplicant@${IFACE}.conf
 ```
 
 **Configure DNS**
