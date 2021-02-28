@@ -1,4 +1,4 @@
-TARGETS := lint test build install uninstall clean
+TARGETS := lint test build clean
 .PHONY: $(TARGETS)
 
 export SHELL := /bin/bash
@@ -17,12 +17,12 @@ test:
 build:
 	@goreleaser release --skip-publish --snapshot --rm-dist
 
-install: build
-	@sudo install -Dm 755 dist/archsugar-cli_linux_amd64/$(BINARY) /usr/local/bin/$(BINARY)
-	@/usr/local/bin/$(BINARY) completion | sudo install -Dm 644 /dev/stdin /usr/share/zsh/site-functions/_$(BINARY)
+#install: build
+#@sudo install -Dm 755 dist/archsugar-cli_linux_amd64/$(BINARY) /usr/local/bin/$(BINARY)
+#@/usr/local/bin/$(BINARY) completion | sudo install -Dm 644 /dev/stdin /usr/share/zsh/site-functions/_$(BINARY)
 
-uninstall:
-	-@sudo rm -f /usr/local/bin/$(BINARY) /usr/share/zsh/site-functions/_$(BINARY) > /dev/null 2>&1
+#uninstall:
+#-@sudo rm -f /usr/local/bin/$(BINARY) /usr/share/zsh/site-functions/_$(BINARY) > /dev/null 2>&1
 
 FILES_TO_CLEAN := $(shell find . -type d -name dist)
 clean:
