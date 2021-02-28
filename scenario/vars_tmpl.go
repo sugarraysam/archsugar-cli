@@ -29,5 +29,9 @@ var VarsTmpl = `---
 
 # Clone git repos
 # { repo: <repo>, dest: <dest>, version: <branch/tag> }
-git_repos: []
+(( .Name ))_git_repos: []
+
+# Output zsh completion commands to /usr/share/zsh/site-functions/
+# { cmd: <repo>, dest: <dest> }
+(( .Name ))_zsh_completions: []
 `
