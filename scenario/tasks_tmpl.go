@@ -16,6 +16,7 @@ var TasksTmpl = `# (( .Desc ))
     remote_bin: "{{ (( .Name ))_remote_bin }}"
     remote_bin_archives: "{{ (( .Name ))_remote_bin_archives }}"
     git_repos: "{{ (( .Name ))_git_repos }}"
+	zsh_completions: "{{ (( .Name ))_zsh_completions }}"
 
 - name: User commands
   block:

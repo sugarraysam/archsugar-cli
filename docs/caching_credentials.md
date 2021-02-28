@@ -41,8 +41,3 @@ $ ansible-vault encrypt group_vars/all.yml
 Now, when you `$ archsugar run`, you will be prompted for your password manager's master password, in order to retrieve your ansible-vault password, which will decrypt the file containing your sudo password.
 
 The cool part is that this mechanism will use your password manager's underlying credential cache and stop asking for your sudo password everytime!
-
-## Roadmap
-
-- Create packer VM images for easier testing (QEMU, virtualbox, vmware)
-- Provide more explanations on how to fork `archsugar` so can have your own `dotfiles` and personalize your system to a maximum
